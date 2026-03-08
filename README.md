@@ -75,7 +75,7 @@ This repository publishes desktop binaries on version tags (`v*`) via GitHub Act
 For dependent repositories, pin a specific version tag instead of using `latest`.
 An example consumer workflow is provided at:
 
-- `docs/downstream-release-consumer-example.yml`
+- docs/downstream-release-consumer-example.yml\r\n\r\n### Dry Run Before Publishing\r\n\r\nUse .github/workflows/release-dry-run.yml (Run workflow in GitHub Actions) to validate cross-platform bundle builds and artifact packaging without creating a GitHub Release.
 
 ## Configuration
 
@@ -106,5 +106,6 @@ Notable configuration areas:
 ## License
 
 This project is licensed under the MIT License. See `LICENSE` for details.
+
 
 
