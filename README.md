@@ -1,7 +1,7 @@
-# SketchUploader
+# ALDER
 
-SketchUploader is a desktop companion for Arduino development workflows that rely on `arduino-cli`.  
-It provides a focused UI for compiling and uploading sketches, selecting local library folders, and monitoring serial output without switching between multiple terminal sessions.
+Arduino Library Development Environment Resolver is a desktop companion for Arduino development workflows that rely on `arduino-cli`.  
+It is intended to provide a focused, repeatable environment for compiling and uploading sketches, selecting local library folders, and monitoring serial output without switching between multiple terminal sessions.
 
 ## Intent
 
@@ -22,6 +22,7 @@ This project is designed for iterative firmware and library development where ti
 - Integrated serial monitor (connect, stream, send input, line ending control)
 - Persistent app settings in `sketchuploader.config.json`
 - Startup checks for `arduino-cli` availability and required cores
+- Missing `arduino-cli` prompt with one-click install on Windows (via `winget`)
 
 ## Tech Stack
 
@@ -105,3 +106,5 @@ Notable configuration areas:
 ## License
 
 This project is licensed under the MIT License. See `LICENSE` for details.
+
+

@@ -537,6 +537,8 @@ export default function App() {
     const [configSourcePath, setConfigSourcePath] = React.useState<string | null>(null);
     const [configWarnings, setConfigWarnings] = React.useState<string[]>([]);
     const [startupResult, setStartupResult] = React.useState<StartupCheckResult | null>(null);
+    const [isCliInstallPromptOpen, setIsCliInstallPromptOpen] = React.useState(false);
+    const [isInstallingCli, setIsInstallingCli] = React.useState(false);
     const [additionalUrlsDraft, setAdditionalUrlsDraft] = React.useState("");
     const [requiredCoresDraft, setRequiredCoresDraft] = React.useState("");
     const [isSettingsDialogOpen, setIsSettingsDialogOpen] = React.useState(false);
@@ -854,6 +856,53 @@ export default function App() {
         }
     }, [appendOutput]);
 
+    const runStartupChecks = React.useCallback(async () => {
+        try {
+            const startup = await invoke<StartupCheckResult>("run_startup_checks");
+            setStartupResult(startup);
+            appendOutput(startup.ok ? "Startup checks passed." : "Startup checks reported issues.");
+
+            if (!startup.arduinoCliOk) {
+                appendOutput("arduino-cli is unavailable or not working.");
+                setIsCliInstallPromptOpen(true);
+            }
+
+            if (startup.missingCores.length > 0) {
+                appendOutput(`Missing cores: ${startup.missingCores.join(", ")}`);
+            }
+
+            for (const note of startup.notes) {
+                appendOutput(`Startup check: ${note}`);
+            }
+        } catch (error) {
+            appendOutput(`Startup checks failed: ${String(error)}`);
+        }
+    }, [appendOutput]);
+
+    const installArduinoCli = React.useCallback(async () => {
+        try {
+            setIsInstallingCli(true);
+            appendOutput("Attempting to install arduino-cli...");
+            const result = await invoke<CommandResult>("install_arduino_cli");
+            appendOutput(`$ ${result.command}`);
+            appendOutput(result.output);
+
+            if (!result.success) {
+                appendOutput("arduino-cli installation attempt failed.");
+                return;
+            }
+
+            appendOutput("arduino-cli installation succeeded. Re-running startup checks...");
+            setIsCliInstallPromptOpen(false);
+            await runStartupChecks();
+            void refreshBoards();
+        } catch (error) {
+            appendOutput(`arduino-cli installation failed: ${String(error)}`);
+        } finally {
+            setIsInstallingCli(false);
+        }
+    }, [appendOutput, refreshBoards, runStartupChecks]);
+
     const persistBoardOptionOverrides = React.useCallback(
         (nextOverrides: Record<string, string>) => {
             setBoardOptionOverrides(nextOverrides);
@@ -974,29 +1023,11 @@ export default function App() {
                 appendOutput(`Failed to load config: ${String(error)}`);
             }
 
-            try {
-                const startup = await invoke<StartupCheckResult>("run_startup_checks");
-                if (!isMounted) {
-                    return;
-                }
-
-                setStartupResult(startup);
-                appendOutput(startup.ok ? "Startup checks passed." : "Startup checks reported issues.");
-
-                if (!startup.arduinoCliOk) {
-                    appendOutput("arduino-cli is unavailable or not working.");
-                }
-
-                if (startup.missingCores.length > 0) {
-                    appendOutput(`Missing cores: ${startup.missingCores.join(", ")}`);
-                }
-
-                for (const note of startup.notes) {
-                    appendOutput(`Startup check: ${note}`);
-                }
-            } catch (error) {
-                appendOutput(`Startup checks failed: ${String(error)}`);
+            if (!isMounted) {
+                return;
             }
+            await runStartupChecks();
+
         })();
 
         void refreshBoards();
@@ -1006,7 +1037,7 @@ export default function App() {
         return () => {
             isMounted = false;
         };
-    }, [appendOutput, appendSerial, refreshBoards, refreshInstalledLibraries, refreshPorts]);
+    }, [appendOutput, appendSerial, refreshBoards, refreshInstalledLibraries, refreshPorts, runStartupChecks]);
 
     React.useEffect(() => {
         const refreshPortsInBackground = () => {
@@ -1776,6 +1807,36 @@ export default function App() {
                     />
                 </div>
             </Dialog>
+            <Dialog
+                open={isCliInstallPromptOpen}
+                onClose={() => {
+                    if (!isInstallingCli) {
+                        setIsCliInstallPromptOpen(false);
+                    }
+                }}
+                modal={true}
+                draggable={false}
+            >
+                <div className="app-stack app-settings-tabs">
+                    <h3>Install arduino-cli</h3>
+                    <p>
+                        ALDER detected that <code>arduino-cli</code> is unavailable. Install it now to enable board discovery,
+                        compile, upload, and library listing features.
+                    </p>
+                    <div className="app-settings-inline">
+                        <Button onClick={installArduinoCli} disabled={isInstallingCli}>
+                            {isInstallingCli ? "Installing..." : "Install arduino-cli"}
+                        </Button>
+                        <Button
+                            type="button"
+                            onClick={() => setIsCliInstallPromptOpen(false)}
+                            disabled={isInstallingCli}
+                        >
+                            Not now
+                        </Button>
+                    </div>
+                </div>
+            </Dialog>
 
             <main className="app-main-grid">
                 <Card className="app-card app-main-full-span">
@@ -1989,3 +2050,6 @@ export default function App() {
         </div>
     );
 }
+
+
+

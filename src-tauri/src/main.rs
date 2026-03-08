@@ -366,6 +366,56 @@ fn run_arduino_cli_raw_static(args: &[&str]) -> Result<CliExecution, String> {
     run_arduino_cli_raw(&owned)
 }
 
+#[tauri::command]
+async fn install_arduino_cli() -> Result<CommandResult, String> {
+    tauri::async_runtime::spawn_blocking(|| {
+        if let Ok(result) = run_arduino_cli_static(&["version"]) {
+            if result.success {
+                return Ok(CommandResult {
+                    command: String::from("arduino-cli version"),
+                    success: true,
+                    output: String::from("arduino-cli is already installed."),
+                });
+            }
+        }
+
+        #[cfg(target_os = "windows")]
+        {
+            let args = vec![
+                "install",
+                "-e",
+                "--id",
+                "ArduinoSA.CLI",
+                "--accept-package-agreements",
+                "--accept-source-agreements",
+            ];
+            let output = Command::new("winget").args(&args).output().map_err(|err| {
+                format!(
+                    "Failed to launch winget. Install arduino-cli manually or ensure winget is available: {}",
+                    err
+                )
+            })?;
+
+            let stdout = String::from_utf8_lossy(&output.stdout).to_string();
+            let stderr = String::from_utf8_lossy(&output.stderr).to_string();
+
+            return Ok(CommandResult {
+                command: format!("winget {}", args.join(" ")),
+                success: output.status.success(),
+                output: format_cli_output(&stdout, &stderr),
+            });
+        }
+
+        #[cfg(not(target_os = "windows"))]
+        {
+            Err(String::from(
+                "Automatic install is currently supported on Windows only. Install arduino-cli manually and restart ALDER.",
+            ))
+        }
+    })
+    .await
+    .map_err(|err| format!("arduino-cli install task failed: {}", err))?
+}
 fn config_candidate_paths() -> Vec<PathBuf> {
     let mut paths = Vec::new();
     if let Ok(cwd) = std::env::current_dir() {
@@ -1332,6 +1382,7 @@ fn main() {
             get_app_config,
             save_app_config,
             run_startup_checks,
+            install_arduino_cli,
             list_arduino_boards,
             list_arduino_ports,
             get_board_option_menus,
@@ -1346,3 +1397,4 @@ fn main() {
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
+
