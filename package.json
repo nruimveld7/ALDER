@@ -12,13 +12,28 @@
     },
     "devDependencies": {
         "@tauri-apps/cli": "^2.0.0",
+        "@types/react": "^19.2.2",
+        "@types/react-dom": "^19.2.2",
         "@vitejs/plugin-react": "^4.3.0",
-        "typescript": "^5.4.0",
+        "typescript": "^5.9.3",
         "vite": "^5.4.0"
     },
     "dependencies": {
         "@tauri-apps/api": "^2.0.0",
-        "react": "^18.2.0",
-        "react-dom": "^18.2.0"
-    }
+        "react": "^19.2.4",
+        "react-dom": "^19.2.4",
+        "react-ui-suite": "^1.1.13"
+    },
+    "description": "",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/nruimveld7/SketchUploader.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/nruimveld7/SketchUploader/issues"
+    },
+    "homepage": "https://github.com/nruimveld7/SketchUploader#readme"
 }

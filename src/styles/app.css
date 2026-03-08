@@ -1,0 +1,629 @@
+html,
+body {
+    margin: 0;
+    font-family: "Segoe UI", "Inter", "Helvetica Neue", Arial, sans-serif;
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+.app-shell {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+    background: var(--rui-color-surface-muted);
+    color: var(--rui-color-text-strong);
+}
+
+:root {
+    --app-toolbar-control-height: 46px;
+}
+
+.app-header {
+    position: relative;
+    border-bottom: 1px solid var(--rui-color-border);
+    background: var(--rui-color-surface);
+    padding: 0.75rem 1rem;
+}
+
+.app-header-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.app-settings-button.rui-button {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.75rem;
+    z-index: 1;
+    width: 2.5rem;
+    height: 2.5rem;
+    min-width: 2.5rem;
+    padding: 0;
+    border-radius: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.app-settings-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.app-icon-button.rui-button {
+    width: var(--app-toolbar-control-height);
+    min-width: var(--app-toolbar-control-height);
+    height: var(--app-toolbar-control-height);
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.app-icon-svg {
+    width: 1.32rem;
+    height: 1.32rem;
+    display: block;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.75;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.app-settings-tabs .rui-tab-group {
+    height: min(46.5rem, 86vh);
+}
+
+.app-settings-tabs .rui-tab-group__panel {
+    overflow: auto;
+}
+
+.rui-dialog__card {
+    width: min(1560px, calc(100vw - 0.5rem)) !important;
+    max-width: none !important;
+}
+
+.rui-overlay-root.rui-dialog__dock {
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    height: 100vh !important;
+    width: 100vw !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 0.25rem !important;
+}
+
+.rui-textarea.rui-root:has(.app-textarea-installed-libraries) {
+    height: 100%;
+}
+
+.rui-textarea.rui-root:has(.app-textarea-about) {
+    height: 100%;
+}
+
+.rui-tab-group__tab,
+.rui-tab-group__label {
+    color: var(--rui-color-text-strong);
+}
+
+.app-settings-tabs .rui-tab-group__panel .rui-checkbox {
+    border: 1px solid var(--rui-color-border);
+    border-radius: 0.5rem;
+    padding: 0.35rem 0.5rem;
+}
+
+.app-about-pane {
+    display: flex;
+    height: 100%;
+}
+
+.app-about-pane .rui-textarea.rui-root {
+    flex: 1;
+}
+
+.app-about-pane .rui-textarea__shell {
+    height: 100%;
+}
+
+.app-libraries-pane {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.app-tools-pane {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.app-tools-board-options {
+    border: 1px solid var(--rui-color-border);
+    border-radius: 0.5rem;
+    background: var(--rui-color-surface-muted);
+    padding: 0.75rem;
+}
+
+.app-tools-board-options-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.app-tools-board-options-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--rui-color-text-strong);
+}
+
+.app-tools-board-options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+    gap: 0.75rem;
+}
+
+.app-tools-board-option-item {
+    border: 1px solid var(--rui-color-border);
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    background: var(--rui-color-surface);
+}
+
+.app-tools-board-option-item .rui-button {
+    margin-top: 0.5rem;
+    width: 100%;
+}
+
+.app-tools-advanced-block {
+    border-top: 1px solid var(--rui-color-border);
+    padding-top: 0.5rem;
+}
+
+.app-tools-note {
+    color: var(--rui-color-text-muted);
+}
+
+.app-libraries-pane .rui-textarea.rui-root:has(.app-textarea-installed-libraries) {
+    flex: 1;
+    min-height: 0;
+}
+
+.app-libraries-pane .rui-textarea__shell {
+    height: 100%;
+}
+
+.app-card {
+    border: 1px solid var(--rui-color-border);
+    background: var(--rui-color-surface);
+}
+
+.rui-output-chip {
+    box-shadow: none;
+}
+
+.rui-card__body.rui-text-wrap {
+    margin-top: 0;
+}
+
+.app-action-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.app-config-split-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+}
+
+.app-config-pane {
+    min-width: 0;
+}
+
+.app-picker-container {
+    border: 1px solid var(--rui-color-border);
+    border-radius: 0.5rem;
+    background: var(--rui-color-surface-muted);
+    padding: 0.5rem;
+}
+
+.app-picker-scroll {
+    max-height: 15rem;
+    overflow: auto;
+    padding-right: 0.25rem;
+}
+
+.app-settings-compact {
+    display: grid;
+    gap: 0.625rem;
+}
+
+.app-preferences-pane {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+}
+
+.app-preferences-pane .rui-textarea.rui-root:has(.app-textarea-board-urls) {
+    flex: 1;
+    min-height: 0;
+}
+
+.app-preferences-pane .rui-textarea.rui-root:has(.app-textarea-board-urls) .rui-textarea__shell {
+    height: 100%;
+}
+
+.app-settings-inline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.app-setting-field {
+    width: min(18rem, 100%);
+}
+
+.app-settings-toggles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    gap: 0.5rem 0.75rem;
+}
+
+.app-stack > * + * {
+    margin-top: 0.75rem;
+}
+
+.app-field-label {
+    margin-bottom: 0.25rem;
+    font-size: 0.75rem;
+    color: var(--rui-color-text-muted);
+}
+
+.app-board-label {
+    margin: 0;
+    margin-bottom: 0.375rem;
+    line-height: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+}
+
+.app-chip-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.app-device-grid {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-evenly;
+    gap: 0.75rem;
+}
+
+.app-device-field {
+    flex: 0 1 49%;
+    max-width: 50%;
+    min-width: 14rem;
+}
+
+.app-device-field .app-board-label {
+    text-align: center;
+}
+
+.app-main-grid {
+    display: grid;
+    flex: 1;
+    grid-template-columns: 1fr;
+    align-content: start;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    min-height: 0;
+}
+
+.app-main-full-span {
+    align-self: start;
+    width: fit-content;
+    max-width: 100%;
+    justify-self: center;
+}
+
+.app-main-full-span > .rui-card__body {
+    flex: 0 0 auto;
+}
+
+.app-panel-card {
+    min-height: 0;
+}
+
+.app-panel-card > .rui-card__body {
+    display: flex;
+    min-height: 0;
+    height: 100%;
+}
+
+.app-panel-content {
+    display: flex;
+    min-height: 0;
+    flex: 1;
+}
+
+.app-output-content {
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.app-output-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.app-output-toolbar-left {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    flex: 1 1 16rem;
+    min-width: 0;
+    gap: 0.5rem;
+}
+
+.app-output-toolbar-right {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    flex: 1 1 18rem;
+    min-width: 0;
+    gap: 0.5rem;
+    width: auto;
+}
+
+.app-output-heading {
+    order: -1;
+    flex: 1 1 100%;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--rui-color-text-strong);
+}
+
+.app-serial-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.app-serial-toolbar-left {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    flex: 0 1 auto;
+    min-width: 0;
+    gap: 0.5rem;
+}
+
+.app-serial-connect-button.rui-button {
+    width: 9.5rem;
+    min-width: 9.5rem;
+    max-width: 9.5rem;
+    height: var(--app-toolbar-control-height);
+    justify-content: center;
+    white-space: nowrap;
+    transition: box-shadow 140ms ease, border-color 140ms ease, background-color 140ms ease;
+}
+
+.app-output-toolbar .rui-button,
+.app-serial-toolbar .rui-button,
+.app-serial-row .rui-button {
+    height: var(--app-toolbar-control-height);
+}
+
+.app-serial-connect-closed.rui-button {
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, #f43f5e 52%, transparent);
+}
+
+.app-serial-connect-connecting.rui-button {
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, #f59e0b 58%, transparent);
+}
+
+.app-serial-connect-open.rui-button {
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, #10b981 52%, transparent);
+}
+
+.app-serial-toolbar-right {
+    display: grid;
+    grid-template-columns: 11.5rem 7.5rem var(--app-toolbar-control-height) var(--app-toolbar-control-height);
+    align-items: center;
+    justify-content: end;
+    flex: 0 1 auto;
+    min-width: min-content;
+    margin-left: auto;
+    gap: 0.5rem;
+}
+
+.app-serial-toolbar-right .app-serial-select-ending {
+    width: 11.5rem;
+}
+
+.app-serial-toolbar-right .app-serial-select-baud {
+    width: 7.5rem;
+}
+
+.app-serial-heading {
+    order: -1;
+    flex: 1 1 100%;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--rui-color-text-strong);
+}
+
+.app-log-host {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+}
+
+.app-log-host .rui-textarea.rui-root {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    width: 100%;
+    min-height: 0;
+}
+
+.app-log-host .rui-textarea__shell {
+    flex: 1;
+    height: 100%;
+    width: 100%;
+    min-height: 0;
+}
+
+.app-log-host .rui-textarea__control {
+    height: 100%;
+    width: 100%;
+    min-height: 0;
+}
+
+.app-log-textarea {
+    font-size: 0.75rem;
+}
+
+.app-serial-card .app-log-textarea {
+    flex: 1;
+    min-height: 0;
+}
+
+.app-serial-card .app-stack {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    min-height: 0;
+}
+
+.app-serial-card .rui-textarea.rui-root {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    width: 100%;
+    min-height: 0;
+}
+
+.app-serial-card .rui-textarea__shell {
+    flex: 1;
+    height: 100%;
+    width: 100%;
+    min-height: 0;
+}
+
+.app-serial-card .rui-textarea__control {
+    height: 100%;
+    width: 100%;
+    min-height: 0;
+}
+
+.app-serial-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 0.5rem;
+}
+
+.app-serial-row .rui-button {
+    flex: 0 0 auto;
+}
+
+.app-grow {
+    flex: 1;
+}
+
+.app-small-text {
+    font-size: 0.75rem;
+}
+
+.app-muted-text {
+    color: var(--rui-color-text-muted);
+}
+
+.app-library-paths {
+    max-height: 7rem;
+    overflow: auto;
+    border-radius: 0.375rem;
+    border: 1px solid var(--rui-color-border);
+    background: var(--rui-color-surface-muted);
+    padding: 0.5rem;
+}
+
+.app-library-path-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.app-library-path-row + .app-library-path-row {
+    margin-top: 0.5rem;
+}
+
+.app-library-path-value {
+    word-break: break-all;
+    flex: 1;
+}
+
+@media (min-width: 1024px) {
+    .app-config-split-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .app-main-full-span {
+        grid-column: 1 / -1;
+        width: 50%;
+    }
+
+    .app-main-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-rows: auto minmax(0, 1fr);
+    }
+
+    .app-output-card,
+    .app-serial-card {
+        height: 100%;
+    }
+
+}
+
+@media (max-width: 980px) {
+    .app-serial-toolbar-left {
+        flex: 1 1 auto;
+    }
+
+    .app-serial-toolbar-right {
+        width: 100%;
+        margin-left: 0;
+        min-width: 0;
+        grid-template-columns: minmax(0, 1fr) 7rem var(--app-toolbar-control-height) var(--app-toolbar-control-height);
+    }
+
+    .app-serial-toolbar-right .app-serial-select-ending,
+    .app-serial-toolbar-right .app-serial-select-baud {
+        width: 100%;
+    }
+}

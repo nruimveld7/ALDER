@@ -1,0 +1,53 @@
+{
+  "$schemaVersion": 1,
+  "sketchRoots": [],
+  "defaultSketchPath": "C:\\Users\\Admin\\Documents\\Arduino\\HelloWorld\\HelloWorld.ino",
+  "defaultBoardFqbn": "arduino:avr:mega",
+  "defaultPort": "COM3",
+  "defaultBaud": 115200,
+  "preferences": {
+    "theme": "dark",
+    "verboseCompile": false,
+    "verboseUpload": false,
+    "warnings": "default",
+    "verifyAfterUpload": false,
+    "cleanBuild": false,
+    "autoOpenSerialOnUploadSuccess": true,
+    "additionalBoardManagerUrls": [
+      "http://arduino.esp8266.com/stable/package_esp8266com_index.json",
+      "https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json",
+      "https://raw.githubusercontent.com/ricardoquesada/esp32-arduino-lib-builder/master/bluepad32_files/package_esp32_bluepad32_index.json"
+    ]
+  },
+  "libraries": {
+    "selectedPaths": [
+      "C:\\Users\\Admin\\Documents\\Git Clones\\Arduino Libraries\\GamepadSerialBridge\\build",
+      "C:\\Users\\Admin\\Documents\\Git Clones\\Arduino Libraries\\GamepadSerialBridge\\build\\Application",
+      "C:\\Users\\Admin\\Documents\\Git Clones\\Arduino Libraries\\GamepadSerialBridge\\build\\Application\\tmp",
+      "C:\\Users\\Admin\\Documents\\Git Clones\\Arduino Libraries\\GamepadSerialBridge\\old"
+    ],
+    "allowInstalledFallback": true,
+    "showInstalledFromCli": true
+  },
+  "tools": {
+    "requiredCores": [],
+    "programmer": "",
+    "boardOptions": {}
+  },
+  "startupChecks": {
+    "enabled": true,
+    "checkArduinoCli": true,
+    "checkCoreIndex": true,
+    "checkRequiredCores": true,
+    "autoRunCoreUpdate": false,
+    "promptInstallMissingCores": true
+  },
+  "build": {
+    "buildRoot": "build",
+    "extraCompileArgs": [],
+    "extraUploadArgs": []
+  },
+  "about": {
+    "readmePath": "README.md"
+  }
+}

@@ -1,0 +1,66 @@
+name: Consume SketchUploader Release
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+env:
+  SKETCHUPLOADER_REPO: nruimveld7/SketchUploader
+  SKETCHUPLOADER_VERSION: v0.0.1
+  SKETCHUPLOADER_ARCH: X64
+
+jobs:
+  fetch-and-run:
+    runs-on: windows-latest
+    steps:
+      - name: Download release manifest
+        shell: pwsh
+        run: |
+          $base = "https://github.com/${env:SKETCHUPLOADER_REPO}/releases/download/${env:SKETCHUPLOADER_VERSION}"
+          Invoke-WebRequest "$base/release-manifest.json" -OutFile release-manifest.json
+
+      - name: Select Windows asset from manifest
+        id: select
+        shell: pwsh
+        run: |
+          $manifest = Get-Content release-manifest.json | ConvertFrom-Json
+          $candidate = $manifest.assets `
+            | Where-Object { $_.os -eq "Windows" -and $_.arch -eq $env:SKETCHUPLOADER_ARCH -and $_.name -match "\.(exe|msi)$" } `
+            | Select-Object -First 1
+          if (-not $candidate) {
+            throw "No Windows asset found in release manifest."
+          }
+          "asset_name=$($candidate.name)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "asset_sha=$($candidate.sha256)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
+      - name: Download selected asset
+        shell: pwsh
+        run: |
+          $base = "https://github.com/${env:SKETCHUPLOADER_REPO}/releases/download/${env:SKETCHUPLOADER_VERSION}"
+          $assetName = "${{ steps.select.outputs.asset_name }}"
+          Invoke-WebRequest "$base/$assetName" -OutFile "$assetName"
+
+      - name: Verify checksum
+        shell: pwsh
+        run: |
+          $assetName = "${{ steps.select.outputs.asset_name }}"
+          $expected = "${{ steps.select.outputs.asset_sha }}".ToLowerInvariant()
+          $actual = (Get-FileHash -Algorithm SHA256 -Path $assetName).Hash.ToLowerInvariant()
+          if ($actual -ne $expected) {
+            throw "SHA256 mismatch for $assetName. Expected $expected, got $actual."
+          }
+          Write-Host "Checksum OK for $assetName"
+
+      - name: Launch app binary (example)
+        shell: pwsh
+        run: |
+          $assetName = "${{ steps.select.outputs.asset_name }}"
+          if ($assetName.EndsWith(".exe")) {
+            Start-Process -FilePath ".\$assetName"
+          } elseif ($assetName.EndsWith(".msi")) {
+            # Replace with your preferred install strategy in CI.
+            Start-Process msiexec.exe -ArgumentList "/i `"$assetName`" /qn" -Wait
+          } else {
+            throw "Unsupported Windows asset type: $assetName"
+          }

@@ -1,0 +1,157 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - windows-latest
+          - macos-latest
+          - ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libgtk-3-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            patchelf
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Tauri bundles
+        run: npm run tauri:build
+
+      - name: Collect bundle artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          BUNDLE_DIR="src-tauri/target/release/bundle"
+          if [ ! -d "$BUNDLE_DIR" ]; then
+            echo "Bundle directory not found: $BUNDLE_DIR"
+            exit 1
+          fi
+
+          while IFS= read -r -d '' file; do
+            base="$(basename "$file")"
+            cp "$file" "dist/${RUNNER_OS}-${RUNNER_ARCH}-${base}"
+          done < <(find "$BUNDLE_DIR" -type f \
+            \( -iname "*.msi" -o -iname "*.exe" -o -iname "*.dmg" -o -iname "*.pkg" -o -iname "*.appimage" -o -iname "*.deb" -o -iname "*.rpm" -o -iname "*.tar.gz" -o -iname "*.zip" \) -print0)
+
+          if [ -z "$(ls -A dist)" ]; then
+            echo "No bundle artifacts found under $BUNDLE_DIR"
+            find "$BUNDLE_DIR" -maxdepth 4 -type f
+            exit 1
+          fi
+
+          ls -la dist
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundles-${{ matrix.os }}
+          path: dist/*
+          if-no-files-found: error
+
+  publish:
+    name: Publish GitHub Release
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download all bundle artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: bundles-*
+          merge-multiple: true
+          path: release-assets/raw
+
+      - name: Generate checksums and manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p release-assets
+          cd release-assets/raw
+          sha256sum * > ../SHA256SUMS.txt
+          cd ../..
+
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          assets_dir = Path("release-assets/raw")
+          assets = []
+          for path in sorted(assets_dir.iterdir()):
+              if not path.is_file():
+                  continue
+              digest = hashlib.sha256(path.read_bytes()).hexdigest()
+              name = path.name
+              parts = name.split("-", 2)
+              os_name = parts[0] if len(parts) > 2 else None
+              arch = parts[1] if len(parts) > 2 else None
+              assets.append(
+                  {
+                      "name": name,
+                      "size": path.stat().st_size,
+                      "sha256": digest,
+                      "os": os_name,
+                      "arch": arch,
+                  }
+              )
+
+          manifest = {
+              "tag": os.environ.get("GITHUB_REF_NAME"),
+              "generatedAtUtc": datetime.now(timezone.utc).isoformat(),
+              "assets": assets,
+          }
+
+          Path("release-assets/release-manifest.json").write_text(
+              json.dumps(manifest, indent=2) + "\n",
+              encoding="utf-8",
+          )
+          PY
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            release-assets/raw/*
+            release-assets/SHA256SUMS.txt
+            release-assets/release-manifest.json
+          generate_release_notes: true
+          fail_on_unmatched_files: true

@@ -1,0 +1,44 @@
+{
+  "$schemaVersion": 1,
+  "sketchRoots": [],
+  "defaultSketchPath": "",
+  "defaultBoardFqbn": "",
+  "defaultPort": "",
+  "defaultBaud": 115200,
+  "preferences": {
+    "theme": "system",
+    "verboseCompile": false,
+    "verboseUpload": true,
+    "warnings": "default",
+    "verifyAfterUpload": false,
+    "cleanBuild": false,
+    "autoOpenSerialOnUploadSuccess": false,
+    "additionalBoardManagerUrls": []
+  },
+  "libraries": {
+    "selectedPaths": [],
+    "allowInstalledFallback": true,
+    "showInstalledFromCli": true
+  },
+  "tools": {
+    "requiredCores": [],
+    "programmer": "",
+    "boardOptions": {}
+  },
+  "startupChecks": {
+    "enabled": true,
+    "checkArduinoCli": true,
+    "checkCoreIndex": true,
+    "checkRequiredCores": true,
+    "autoRunCoreUpdate": false,
+    "promptInstallMissingCores": true
+  },
+  "build": {
+    "buildRoot": "build",
+    "extraCompileArgs": [],
+    "extraUploadArgs": []
+  },
+  "about": {
+    "readmePath": "README.md"
+  }
+}
