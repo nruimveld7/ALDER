@@ -63,7 +63,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p dist
+          mkdir -p release-bundles
           BUNDLE_DIR="src-tauri/target/release/bundle"
           if [ ! -d "$BUNDLE_DIR" ]; then
             echo "Bundle directory not found: $BUNDLE_DIR"
@@ -72,23 +72,23 @@ jobs:
 
           while IFS= read -r -d '' file; do
             base="$(basename "$file")"
-            cp "$file" "dist/${RUNNER_OS}-${RUNNER_ARCH}-${base}"
+            cp "$file" "release-bundles/${RUNNER_OS}-${RUNNER_ARCH}-${base}"
           done < <(find "$BUNDLE_DIR" -type f \
             \( -iname "*.msi" -o -iname "*.exe" -o -iname "*.dmg" -o -iname "*.pkg" -o -iname "*.appimage" -o -iname "*.deb" -o -iname "*.rpm" -o -iname "*.tar.gz" -o -iname "*.zip" \) -print0)
 
-          if [ -z "$(ls -A dist)" ]; then
+          if [ -z "$(ls -A release-bundles)" ]; then
             echo "No bundle artifacts found under $BUNDLE_DIR"
             find "$BUNDLE_DIR" -maxdepth 4 -type f
             exit 1
           fi
 
-          ls -la dist
+          ls -la release-bundles
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: bundles-${{ matrix.os }}
-          path: dist/*
+          path: release-bundles/*
           if-no-files-found: error
 
   publish:
@@ -109,7 +109,7 @@ jobs:
           set -euo pipefail
           mkdir -p release-assets
           cd release-assets/raw
-          sha256sum * > ../SHA256SUMS.txt
+          find . -maxdepth 1 -type f -print0 | sort -z | xargs -0 sha256sum > ../SHA256SUMS.txt
           cd ../..
 
           python - <<'PY'
