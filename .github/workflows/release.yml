@@ -1,15 +1,21 @@
 name: Release
 
 on:
-  push:
-    tags:
-      - "v*"
+  release:
+    types:
+      - published
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to build/publish assets for (example: v1.0.0). Leave empty to use current ref."
+        required: false
+        type: string
 
 permissions:
   contents: write
 
 concurrency:
-  group: release-${{ github.ref }}
+  group: release-${{ github.event.release.tag_name || github.event.inputs.tag || github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -27,6 +33,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag != '' && github.event.inputs.tag || (github.event.release.tag_name != '' && github.event.release.tag_name || github.ref_name) }}
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -95,6 +103,8 @@ jobs:
     name: Publish GitHub Release
     runs-on: ubuntu-latest
     needs: build
+    env:
+      RELEASE_TAG: ${{ github.event.inputs.tag != '' && github.event.inputs.tag || (github.event.release.tag_name != '' && github.event.release.tag_name || github.ref_name) }}
     steps:
       - name: Download all bundle artifacts
         uses: actions/download-artifact@v4
@@ -140,7 +150,7 @@ jobs:
               )
 
           manifest = {
-              "tag": os.environ.get("GITHUB_REF_NAME"),
+              "tag": os.environ.get("RELEASE_TAG"),
               "generatedAtUtc": datetime.now(timezone.utc).isoformat(),
               "assets": assets,
           }
@@ -154,6 +164,7 @@ jobs:
       - name: Publish release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ env.RELEASE_TAG }}
           files: |
             release-assets/raw/*
             release-assets/SHA256SUMS.txt
